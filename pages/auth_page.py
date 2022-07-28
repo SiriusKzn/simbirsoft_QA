@@ -1,7 +1,9 @@
 import time
 
 import pytest
+import selenium.common.exceptions
 import webdriver_manager.drivers.chrome
+from selenium.webdriver.common.by import By
 
 from data import data
 from locators.auth_page_locators import AuthPageLocators
@@ -20,4 +22,9 @@ class AuthPage(BasePage):
         self.element_is_visible(self.locators.LOGIN_BUTTON).click()
         self.element_is_visible(self.locators.PASSWORD_TEXTBOX).send_keys(data.YA_PASS)
         self.element_is_visible(self.locators.LOGIN_BUTTON).click()
-        self.element_is_visible(self.locators.HOME_LOGO)
+        time.sleep(1)
+        try:
+            if self.element_is_visible((By.CSS_SELECTOR, "div[class='passp-button']"), 2):
+                pytest.skip("Яндекс вернул страницу авторизации по телефону")
+        except selenium.common.exceptions.TimeoutException:
+            self.element_is_visible(self.locators.HOME_LOGO)
